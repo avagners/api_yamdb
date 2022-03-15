@@ -13,7 +13,6 @@ ALLOWED_HOSTS = ['*']
 
 
 # Application definition
-AUTH_USER_MODEL = 'users.User'
 
 INSTALLED_APPS = [
     'reviews.apps.ReviewsConfig',
@@ -105,3 +104,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
+
+AUTH_USER_MODEL = 'users.User'
