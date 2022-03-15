@@ -2,9 +2,6 @@ from django.db import models
 from users.models import User
 
 
-from users.models import User
-
-
 class Category(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(
@@ -51,7 +48,7 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
-    """Модель отзывов."""
+    """Модель комментариев."""
     text = models.TextField()
     author = models.ForeignKey(
         User,
