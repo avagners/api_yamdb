@@ -15,11 +15,9 @@ class User(AbstractUser):
         unique=True,
     )
     bio = models.TextField(
-        "Биография",
         blank=True,
     )
     role = models.TextField(
-        "Пользовательская роль",
         choices=USER_ROLE,
         default='USER',
     )
