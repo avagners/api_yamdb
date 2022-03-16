@@ -25,6 +25,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     filter_backends = (filters.SearchFilter,)
     pagination_class = LimitOffsetPagination
+    lookup_field = 'username'
     search_fields = ('username',)
 
 
