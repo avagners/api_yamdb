@@ -3,6 +3,7 @@ from users.models import User
 
 
 class Category(models.Model):
+    """Модель категорий."""
     name = models.CharField(max_length=256)
     slug = models.SlugField(
         max_length=50,
@@ -14,6 +15,7 @@ class Category(models.Model):
 
 
 class Genre(models.Model):
+    """Модель жанров."""
     name = models.CharField(max_length=256)
     slug = models.SlugField(
         max_length=50,
@@ -21,6 +23,11 @@ class Genre(models.Model):
 
     def __str__(self):
         return self.slug
+
+
+class Title(models.Model):
+    """Модель произведений."""
+    pass
 
 
 class Review(models.Model):
