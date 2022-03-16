@@ -1,5 +1,4 @@
-from email.policy import default
-from rest_framework import serializers, validators
+from rest_framework import serializers
 from users.models import User
 from reviews.models import Review, Comment, Title
 
