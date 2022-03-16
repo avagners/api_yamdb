@@ -1,5 +1,7 @@
 from rest_framework import viewsets
 from reviews.models import Category, Comment, Genre, Review, Title
+from users.models import User
+from .serializers import UserSerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -16,6 +18,10 @@ class TitleViewSet(viewsets.ModelViewSet):
     """Класс произведений."""
     pass
 
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
 
