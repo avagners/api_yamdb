@@ -1,14 +1,23 @@
+from datetime import date
+
+from django.core.validators import MaxValueValidator
 from django.db import models
 from users.models import User
 
 
 class Category(models.Model):
     """Модель категорий."""
-    name = models.CharField(max_length=256)
+    name = models.CharField(
+        max_length=256,
+        unique=True
+    )
     slug = models.SlugField(
         max_length=50,
         unique=True
     )
+
+    class Meta:
+        ordering = ('slug',)
 
     def __str__(self):
         return self.slug
@@ -16,10 +25,17 @@ class Category(models.Model):
 
 class Genre(models.Model):
     """Модель жанров."""
-    name = models.CharField(max_length=256)
+    name = models.CharField(
+        max_length=256,
+        unique=True
+    )
     slug = models.SlugField(
         max_length=50,
-        unique=True)
+        unique=True
+    )
+
+    class Meta:
+        ordering = ('slug',)
 
     def __str__(self):
         return self.slug
@@ -27,7 +43,27 @@ class Genre(models.Model):
 
 class Title(models.Model):
     """Модель произведений."""
-    pass
+    name = models.CharField(max_length=100)
+    year = models.IntegerField(
+        null=True,
+        blank=True,
+        validators=[MaxValueValidator(limit_value=date.today)]
+    )
+    genre = models.ManyToManyField(
+        Genre,
+        related_name='titles'
+    )
+    description = models.TextField(blank=True)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='titles'
+    )
+
+    def __str__(self):
+        return self.name
 
 
 class Review(models.Model):
