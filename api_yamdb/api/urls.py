@@ -4,7 +4,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .views import (CategoryViewSet, GenreViewSet,
                     TitleViewSet, ReviewViewSet, CommentViewSet,
-                    UserViewSet)
+                    UserViewSet, SendConfirmationCodeView)
 
 router = routers.DefaultRouter()
 
@@ -27,4 +27,8 @@ urlpatterns = [
         'v1/auth/token/',
         TokenObtainPairView.as_view(),
         name='token_obtain_pair'),
+    path(
+        'v1/auth/singup/',
+        SendConfirmationCodeView.as_view(),
+        name='send_confirmation_code'),
 ]
