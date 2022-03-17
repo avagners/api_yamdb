@@ -48,7 +48,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     """Получение и создание отзывов."""
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
-    permission_class = (AllowAny,)
+    permission_class = (AuthorOrAuthenticatedReadOnly,)
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -62,7 +62,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     """Получение и создание комментариев."""
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
-    permission_class = (AllowAny,)
+    permission_class = (AuthorOrAuthenticatedReadOnly,)
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
