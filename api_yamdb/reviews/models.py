@@ -17,7 +17,7 @@ class Category(models.Model):
     )
 
     class Meta:
-        ordering = ('slug',)
+        ordering = ('name',)
 
     def __str__(self):
         return self.slug
@@ -35,7 +35,7 @@ class Genre(models.Model):
     )
 
     class Meta:
-        ordering = ('slug',)
+        ordering = ('name',)
 
     def __str__(self):
         return self.slug
@@ -61,6 +61,15 @@ class Title(models.Model):
         null=True,
         related_name='titles'
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['name', 'year'],
+                name='unique_name_year'
+            )
+        ]
+        ordering = ('id',)
 
     def __str__(self):
         return self.name
