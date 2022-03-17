@@ -4,17 +4,21 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
-from .serializers import UserSerializer, ReviewSerializer, CommentSerializer
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer,
+                          TitleSerializer, UserSerializer)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     """Класс категорий."""
-    pass
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     """Класс жанров."""
-    pass
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
 
 
 class TitleViewSet(viewsets.ModelViewSet):
