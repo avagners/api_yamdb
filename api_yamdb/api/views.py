@@ -3,6 +3,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
+from .permissions import AuthorOrAuthenticatedReadOnly
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -47,6 +48,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     """Получение и создание отзывов."""
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
+    permission_class = (AuthorOrAuthenticatedReadOnly,)
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -58,7 +60,17 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """Получение и создание комментариев."""
-    pass
+    serializer_class = ReviewSerializer
+    pagination_class = LimitOffsetPagination
+    permission_class = (AuthorOrAuthenticatedReadOnly,)
+
+    def get_queryset(self):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        review = title.reviews.all().get(pk=self.kwargs.get('review_id'))
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
 class SendConfirmationCodeView(APIView):

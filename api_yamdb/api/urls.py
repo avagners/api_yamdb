@@ -28,7 +28,7 @@ urlpatterns = [
         TokenObtainPairView.as_view(),
         name='token_obtain_pair'),
     path(
-        'v1/auth/singup/',
+        'v1/auth/signup/',
         SendConfirmationCodeView.as_view(),
         name='send_confirmation_code'),
 ]
