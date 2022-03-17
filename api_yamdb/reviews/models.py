@@ -44,7 +44,7 @@ class Genre(models.Model):
 class Title(models.Model):
     """Модель произведений."""
     name = models.CharField(max_length=100)
-    year = models.IntegerField(
+    year = models.DateField(
         null=True,
         blank=True,
         validators=[MaxValueValidator(limit_value=date.today)]
