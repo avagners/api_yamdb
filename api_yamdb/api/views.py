@@ -1,12 +1,17 @@
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, status
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
-                          TitleSerializer, UserSerializer)
+                          TitleSerializer, UserSerializer,
+                          SendConfirmationCodeSerializer)
+from django.core.mail import send_mail
+import random
+from rest_framework.response import Response
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -51,10 +56,35 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-
-
-
-
 class CommentViewSet(viewsets.ModelViewSet):
     """Получение и создание комментариев."""
     pass
+
+
+class SendConfirmationCodeView(APIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = SendConfirmationCodeSerializer(data=request.data)
+        email = request.data.get('email')
+        username = request.data.get('username')
+
+        if serializer.is_valid():
+            confirmation_code = ''.join(map(str, random.sample(range(10), 6)))
+
+            user = User.objects.filter(email=email).exists()
+            if not user:
+                User.objects.create_user(email=email, username=username)
+            User.objects.filter(email=email).update(
+                confirmation_code=confirmation_code
+            )
+            send_mail(
+                subject='Ваш код подтверждения',
+                message=f'Ваш код подтверждения: {confirmation_code}',
+                from_email='confirmation@yambd.com',
+                recipient_list=[email],
+                fail_silently=False,
+            )
+            return Response(f'Код подтверждения отправлен на адрес {email}',
+                            status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
