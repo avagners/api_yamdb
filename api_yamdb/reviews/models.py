@@ -9,7 +9,7 @@ class Category(models.Model):
     """Модель категорий."""
     name = models.CharField(
         max_length=256,
-        unique=True
+        unique=True,
     )
     slug = models.SlugField(
         max_length=50,
@@ -27,7 +27,7 @@ class Genre(models.Model):
     """Модель жанров."""
     name = models.CharField(
         max_length=256,
-        unique=True
+        unique=True,
     )
     slug = models.SlugField(
         max_length=50,
@@ -43,7 +43,7 @@ class Genre(models.Model):
 
 class Title(models.Model):
     """Модель произведений."""
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, default="")
     year = models.DateField(
         null=True,
         blank=True,
