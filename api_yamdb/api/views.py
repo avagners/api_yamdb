@@ -9,10 +9,11 @@ from users.models import User
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
                           TitleSerializer, UserSerializer,
-                          SendConfirmationCodeSerializer)
+                          SendConfirmationCodeSerializer, SendTokenSerializer)
 from django.core.mail import send_mail
 import random
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import AccessToken
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -74,6 +75,13 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class SendConfirmationCodeView(APIView):
+    """
+    Вью-класс описывает POST-запрос для получаения кода подтверждения,
+    который необходим для получения JWT-токена.
+
+    На вход подается 'username' и 'email', а в ответ происходит отправка
+    на почту письма с кодом подтверждения.
+    """
     permission_classes = (AllowAny,)
 
     def post(self, request):
@@ -97,6 +105,29 @@ class SendConfirmationCodeView(APIView):
                 recipient_list=[email],
                 fail_silently=False,
             )
-            return Response(f'Код подтверждения отправлен на адрес {email}',
-                            status=status.HTTP_200_OK)
+            message = {f'Код подтверждения отправлен на адрес {email}'}
+            return Response(message, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SendTokenView(APIView):
+    """
+    Вью-класс описывает POST-запрос для получаения JWT-токена.
+
+    На вход подается 'username' и 'confirmation_code',
+    а в ответ формируется JWT-токен.
+    """
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = SendTokenSerializer(data=request.data)
+        if serializer.is_valid():
+            user = get_object_or_404(
+                User, username=request.data.get('username')
+            )
+            if user.confirmation_code != request.data.get('confirmation_code'):
+                message = {'confirmation_code': 'Неверный код подтверждения'}
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
+            message = {'token': str(AccessToken.for_user(user))}
+            return Response(message, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

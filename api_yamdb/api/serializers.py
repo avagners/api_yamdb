@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.db.models import Avg
+from django.core.validators import MinLengthValidator
 from users.models import User
 from reviews.models import Category, Genre, Review, Comment, Title
 
@@ -77,3 +78,12 @@ class CommentSerializer(serializers.ModelSerializer):
 class SendConfirmationCodeSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     username = serializers.CharField(required=True)
+
+
+class SendTokenSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(
+        max_length=6,
+        required=True,
+        validators=[MinLengthValidator(6)]
+    )
