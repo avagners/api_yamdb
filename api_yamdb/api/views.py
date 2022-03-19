@@ -1,8 +1,10 @@
 from rest_framework import viewsets, filters, status
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import (LimitOffsetPagination,
+                                       PageNumberPagination)
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
+from .mixins import ListCreateDestroyViewSet
 from .permissions import AuthorOrAuthenticatedReadOnly, IsAdminOrReadOnly
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
@@ -18,7 +20,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(ListCreateDestroyViewSet):
     """Класс категорий."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -27,7 +29,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     search_fields = ('name',)
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(ListCreateDestroyViewSet):
     """Класс жанров."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
@@ -41,6 +43,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = PageNumberPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name', 'year', 'category', 'genre')
 
 
 class UserViewSet(viewsets.ModelViewSet):
