@@ -5,9 +5,9 @@ from django.db import models
 class User(AbstractUser):
 
     USER_ROLE = (
-        ("USER", "user"),
-        ("MODERATOR", "moderator"),
-        ("ADMIN", "admin"),
+        ("user", "user"),
+        ("moderator", "moderator"),
+        ("admin", "admin"),
     )
     email = models.EmailField(max_length=254, unique=True)
     bio = models.TextField(blank=True,)

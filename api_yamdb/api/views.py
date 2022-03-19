@@ -2,7 +2,7 @@ from rest_framework import viewsets, filters, status
 from rest_framework.pagination import (LimitOffsetPagination,
                                        PageNumberPagination)
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .mixins import ListCreateDestroyViewSet
 from .permissions import AuthorOrAuthenticatedReadOnly, IsAdminOrReadOnly
@@ -18,6 +18,7 @@ import random
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action
+from users.permissions import IsAdmin
 
 
 class CategoryViewSet(ListCreateDestroyViewSet):
@@ -51,17 +52,33 @@ class TitleViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsAdmin,)
     filter_backends = (filters.SearchFilter,)
     pagination_class = LimitOffsetPagination
     lookup_field = 'username'
     search_fields = ('username',)
 
-    @action(detail=False, methods=['get', 'patch'], url_path='me')
+    @action(detail=False, methods=['get', 'patch'], url_path='me', permission_classes=[IsAuthenticated])
     def get_or_update_self(self, request):
 
         if request.method != 'GET':
             serializer = UpdateSelfSerializer(instance=request.user, data=request.data)
             serializer.is_valid(raise_exception=True)
+
+            email = serializer.validated_data.get('email')
+            username = serializer.validated_data.get('username')
+            user_email = User.objects.filter(email=email).exists()
+            user_username = User.objects.filter(username=username).exists()
+
+            data_of_me = self.get_serializer(request.user, many=False)
+
+            if user_email and email != data_of_me.data.get('email'):
+                message = {'email': f'{email} уже зарегистрирован'}
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
+            elif user_username and username != data_of_me.data.get('username'):
+                message = {'username': f'{username} уже зарегистрирован'}
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
             serializer.save()
             return Response(serializer.data)
         else:
