@@ -7,13 +7,14 @@ from .permissions import AuthorOrAuthenticatedReadOnly
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, ReviewSerializer,
+                          GenreSerializer, UpdateSelfSerializer, ReviewSerializer,
                           TitleSerializer, UserSerializer,
                           SendConfirmationCodeSerializer, SendTokenSerializer)
 from django.core.mail import send_mail
 import random
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.decorators import action
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -40,6 +41,18 @@ class UserViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     lookup_field = 'username'
     search_fields = ('username',)
+
+    @action(detail=False, methods=['get', 'patch'], url_path='me')
+    def get_or_update_self(self, request):
+        
+        if request.method != 'GET':
+            serializer = UpdateSelfSerializer(instance=request.user, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+        else:
+            serializer = self.get_serializer(request.user, many=False)
+            return Response(serializer.data)
 
     def partial_update(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
