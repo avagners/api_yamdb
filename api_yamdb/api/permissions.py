@@ -16,3 +16,17 @@ class AuthorOrAuthenticatedReadOnly(permissions.BasePermission):
             return True
 
         return obj.author == request.user
+
+
+class IsAdminOrReadOnly(permissions.BasePermission):
+    """
+    Права доступа для админа и только для чтения.
+    """
+    def has_permission(self, request, view):
+        user = request.user
+        return (
+            request.method in permissions.SAFE_METHODS
+            or (
+                user.is_authenticated and user.is_admin()
+            )
+        )

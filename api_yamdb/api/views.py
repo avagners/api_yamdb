@@ -3,11 +3,12 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
-from .permissions import AuthorOrAuthenticatedReadOnly
+from .permissions import AuthorOrAuthenticatedReadOnly, IsAdminOrReadOnly
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, UpdateSelfSerializer, ReviewSerializer,
+                          GenreSerializer, UpdateSelfSerializer,
+                          ReviewSerializer,
                           TitleSerializer, UserSerializer,
                           SendConfirmationCodeSerializer, SendTokenSerializer)
 from django.core.mail import send_mail
@@ -21,17 +22,25 @@ class CategoryViewSet(viewsets.ModelViewSet):
     """Класс категорий."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
 
 
 class GenreViewSet(viewsets.ModelViewSet):
     """Класс жанров."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Класс произведений."""
-    pass
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -44,7 +53,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get', 'patch'], url_path='me')
     def get_or_update_self(self, request):
-        
+
         if request.method != 'GET':
             serializer = UpdateSelfSerializer(instance=request.user, data=request.data)
             serializer.is_valid(raise_exception=True)
