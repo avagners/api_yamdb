@@ -50,6 +50,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """Класс пользователей."""
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAdmin,)
@@ -58,11 +59,16 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     search_fields = ('username',)
 
-    @action(detail=False, methods=['get', 'patch'], url_path='me', permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get', 'patch'],
+            url_path='me', permission_classes=[IsAuthenticated])
     def get_or_update_self(self, request):
-
+        """
+        Функция обрабатывает 'GET' и 'PATCH' запросы на эндпоинт '/users/me/'
+        """
         if request.method != 'GET':
-            serializer = UpdateSelfSerializer(instance=request.user, data=request.data)
+            serializer = UpdateSelfSerializer(
+                instance=request.user, data=request.data
+            )
             serializer.is_valid(raise_exception=True)
 
             email = serializer.validated_data.get('email')
@@ -86,6 +92,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
     def partial_update(self, request, *args, **kwargs):
+        "Функция переопределяет 'PATCH-запрос' на 'PUT'"
         return self.update(request, *args, **kwargs)
 
 
