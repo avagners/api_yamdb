@@ -83,9 +83,7 @@ class SendConfirmationCodeSerializer(serializers.Serializer):
 class SendTokenSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(
-        max_length=6,
         required=True,
-        validators=[MinLengthValidator(6)]
     )
 
 
