@@ -35,3 +35,9 @@ class IsAdmin(BasePermission):
         return (request.user.is_authenticated
                 and (request.user.is_staff or request.user.role == 'admin')
                 )
+
+
+class IsModerator(BasePermission):
+    def has_permission(self, request, view):
+        return (request.user.is_authenticated
+                and request.user.role == 'moderator')
