@@ -23,12 +23,10 @@ class IsAdminOrReadOnly(BasePermission):
     Права доступа для админа и только для чтения.
     """
     def has_permission(self, request, view):
-        user = request.user
         return (
             request.method in SAFE_METHODS
-            or (
-                user.is_authenticated and user.is_admin()
-            )
+            or request.user.is_authenticated
+            and request.user.role == 'admin'
         )
 
 
