@@ -123,7 +123,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         return review.comments.all()
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        review = title.reviews.all().get(pk=self.kwargs.get('review_id'))
+        serializer.save(author=self.request.user, review=review)
 
 
 class SendConfirmationCodeView(APIView):
