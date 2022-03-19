@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from django.db.models import Avg
-from django.core.validators import MinLengthValidator
 from users.models import User
 from reviews.models import Category, Genre, Review, Comment, Title
 
