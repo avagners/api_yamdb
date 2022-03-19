@@ -87,3 +87,14 @@ class SendTokenSerializer(serializers.Serializer):
         required=True,
         validators=[MinLengthValidator(6)]
     )
+
+
+class UpdateSelfSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio'
+        )
