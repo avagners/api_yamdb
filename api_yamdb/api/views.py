@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .mixins import ListCreateDestroyViewSet
-from .permissions import AuthorOrAuthenticatedReadOnly, IsAdminOrReadOnly
+from .permissions import (AuthorOrAuthenticatedReadOnly,
+                          IsAdminOrReadOnly, IsAdmin)
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -18,7 +19,6 @@ import random
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action
-from users.permissions import IsAdmin
 
 
 class CategoryViewSet(ListCreateDestroyViewSet):
