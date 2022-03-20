@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .mixins import ListCreateDestroyViewSet
 from .permissions import (AuthorOrAuthenticatedReadOnly,
-                          IsAdminOrReadOnly, IsAdmin)
+                          IsAdminOrReadOnly, IsAdmin, IsSuperUser)
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -53,7 +53,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """Класс пользователей."""
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdmin, IsSuperUser)
     filter_backends = (filters.SearchFilter,)
     pagination_class = LimitOffsetPagination
     lookup_field = 'username'
