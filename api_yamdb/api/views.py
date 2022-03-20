@@ -71,8 +71,8 @@ class UserViewSet(viewsets.ModelViewSet):
             )
             serializer.is_valid(raise_exception=True)
 
-            email = serializer.validated_data.get('email')
-            username = serializer.validated_data.get('username')
+            email = request.data.get('email')
+            username = request.data.get('username')
             user_email = User.objects.filter(email=email).exists()
             user_username = User.objects.filter(username=username).exists()
 

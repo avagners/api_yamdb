@@ -87,8 +87,8 @@ class SendTokenSerializer(serializers.Serializer):
 
 
 class UpdateSelfSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=True)
-    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=False)
+    username = serializers.CharField(required=False)
 
     class Meta:
         model = User
