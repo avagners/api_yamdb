@@ -43,7 +43,7 @@ class Genre(models.Model):
 
 class Title(models.Model):
     """Модель произведений."""
-    name = models.CharField(max_length=100, default="")
+    name = models.CharField(max_length=100, unique=True)
     year = models.IntegerField(
         null=True,
         blank=True,
