@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .mixins import ListCreateDestroyViewSet
-from .permissions import (AuthorOrAuthenticatedReadOnly,
+from .permissions import (AuthorOrAdminOrModeratorOrReadOnly,
                           IsAdminOrReadOnly, IsAdmin, IsSuperUser)
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
@@ -105,7 +105,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     """Получение и создание отзывов."""
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
-    permission_class = (AuthorOrAuthenticatedReadOnly,)
+    permission_classes = (AuthorOrAdminOrModeratorOrReadOnly,)
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -120,7 +120,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     """Получение и создание комментариев."""
     serializer_class = CommentSerializer
     pagination_class = LimitOffsetPagination
-    permission_class = (AuthorOrAuthenticatedReadOnly,)
+    permission_classes = (AuthorOrAdminOrModeratorOrReadOnly,)
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
