@@ -1,3 +1,5 @@
+from django.core.validators import MaxValueValidator
+from django.utils import timezone
 from rest_framework import serializers
 from django.db.models import Avg
 from users.models import User
@@ -26,13 +28,36 @@ class TitleSerializer(serializers.ModelSerializer):
         fields = ('id',
                   'name',
                   'year',
+                  'rating',
                   'description',
                   'genre',
-                  'category',
-                  'rating',)
+                  'category',)
 
     def get_rating(self, obj):
         return obj.reviews.aggregate(rating=Avg('score')).get('rating')
+
+
+class TitlePostSerializer(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        many=True, slug_field='slug',
+        queryset=Genre.objects.all()
+    )
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Category.objects.all()
+    )
+    year = serializers.IntegerField(validators=(MaxValueValidator(
+        timezone.now().year,
+        message='Год не может быть больше текущего!'),))
+
+    class Meta:
+        model = Title
+        fields = ('id',
+                  'name',
+                  'year',
+                  'description',
+                  'genre',
+                  'category',)
 
 
 class UserSerializer(serializers.ModelSerializer):

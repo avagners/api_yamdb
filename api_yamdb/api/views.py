@@ -12,7 +12,7 @@ from users.models import User
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, UpdateSelfSerializer,
                           ReviewSerializer,
-                          TitleSerializer, UserSerializer,
+                          TitleSerializer, TitlePostSerializer, UserSerializer,
                           SendConfirmationCodeSerializer, SendTokenSerializer)
 from django.core.mail import send_mail
 import random
@@ -47,6 +47,11 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name', 'year', 'category', 'genre')
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TitleSerializer
+        return TitlePostSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):

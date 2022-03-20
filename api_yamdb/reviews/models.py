@@ -1,4 +1,4 @@
-from datetime import date
+from django.utils import timezone
 
 from django.core.validators import MaxValueValidator
 from django.db import models
@@ -44,10 +44,12 @@ class Genre(models.Model):
 class Title(models.Model):
     """Модель произведений."""
     name = models.CharField(max_length=100, default="")
-    year = models.DateField(
+    year = models.IntegerField(
         null=True,
         blank=True,
-        validators=[MaxValueValidator(limit_value=date.today)]
+        validators=(MaxValueValidator(
+            timezone.now().year,
+            message='Год не может быть больше текущего!'),)
     )
     genre = models.ManyToManyField(
         Genre,
