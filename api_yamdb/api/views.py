@@ -25,6 +25,7 @@ class CategoryViewSet(ListCreateDestroyViewSet):
     """Класс категорий."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    lookup_field = 'slug'
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
@@ -34,6 +35,7 @@ class GenreViewSet(ListCreateDestroyViewSet):
     """Класс жанров."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    lookup_field = 'slug'
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
