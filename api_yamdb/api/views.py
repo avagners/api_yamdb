@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .mixins import ListCreateDestroyViewSet
 from .permissions import (AuthorOrAuthenticatedReadOnly,
-                          IsAdminOrReadOnly, IsAdmin, IsSuperUser, IsUser)
+                          IsAdminOrReadOnly, IsAdmin, IsSuperUser)
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -84,7 +84,8 @@ class UserViewSet(viewsets.ModelViewSet):
             elif user_username and username != data_of_me.data.get('username'):
                 message = {'username': f'{username} уже зарегистрирован'}
                 return Response(message, status=status.HTTP_400_BAD_REQUEST)
-            elif data_of_me.data.get('role') == 'user' and 'role' in request.data:
+            elif (data_of_me.data.get('role') == 'user'
+                    and 'role' in request.data):
                 message = {'role': 'user'}
                 return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
