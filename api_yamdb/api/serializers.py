@@ -1,9 +1,10 @@
 from django.core.validators import MaxValueValidator
-from django.utils import timezone
-from rest_framework import serializers, validators
 from django.db.models import Avg
+from django.utils import timezone
+from rest_framework import serializers
+
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
-from reviews.models import Category, Genre, Review, Comment, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -79,7 +80,6 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ('id', 'text', 'author', 'score', 'pub_date')
-
 
     def validate_score(self, value):
         score = [i for i in range(1, 11)]
