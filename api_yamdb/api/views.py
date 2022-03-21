@@ -1,26 +1,29 @@
-from rest_framework import viewsets, filters, status, serializers
+import random
+
+from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, serializers, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.pagination import (LimitOffsetPagination,
                                        PageNumberPagination)
-from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from django.shortcuts import get_object_or_404
-from .mixins import ListCreateDestroyViewSet
-from .permissions import (AuthorOrAdminOrModeratorOrReadOnly,
-                          IsAdminOrReadOnly, IsAdmin, IsSuperUser)
-from reviews.models import Category, Comment, Genre, Review, Title
-from users.models import User
-from .filters import TitleFilter
-from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, UpdateSelfSerializer,
-                          ReviewSerializer,
-                          TitleSerializer, TitlePostSerializer, UserSerializer,
-                          SendConfirmationCodeSerializer, SendTokenSerializer)
-from django.core.mail import send_mail
-import random
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.decorators import action
+
+from reviews.models import Category, Genre, Review, Title
+from users.models import User
+
+from .filters import TitleFilter
+from .mixins import ListCreateDestroyViewSet
+from .permissions import (AuthorOrAdminOrModeratorOrReadOnly, IsAdmin,
+                          IsAdminOrReadOnly, IsSuperUser)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer,
+                          SendConfirmationCodeSerializer, SendTokenSerializer,
+                          TitlePostSerializer, TitleSerializer,
+                          UpdateSelfSerializer, UserSerializer)
 
 
 class CategoryViewSet(ListCreateDestroyViewSet):
