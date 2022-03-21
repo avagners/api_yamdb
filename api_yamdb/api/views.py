@@ -1,4 +1,4 @@
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets, filters, status, serializers
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import (LimitOffsetPagination,
                                        PageNumberPagination)
@@ -118,6 +118,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        if Review.objects.filter(author=self.request.user, title=title):
+            raise serializers.ValidationError(
+                'Нельзя добавить больше одного отзыва!')
         serializer.save(author=self.request.user, title=title)
 
 
