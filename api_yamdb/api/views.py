@@ -1,4 +1,5 @@
 from rest_framework import viewsets, filters, status
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.pagination import (LimitOffsetPagination,
                                        PageNumberPagination)
 from rest_framework.views import APIView
@@ -9,6 +10,7 @@ from .permissions import (AuthorOrAdminOrModeratorOrReadOnly,
                           IsAdminOrReadOnly, IsAdmin, IsSuperUser)
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
+from .filters import TitleFilter
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, UpdateSelfSerializer,
                           ReviewSerializer,
@@ -47,7 +49,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
-    filter_backends = (filters.SearchFilter,)
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend,)
+    filterset_class = TitleFilter
     search_fields = ('name', 'year', 'category', 'genre')
 
     def get_serializer_class(self):
