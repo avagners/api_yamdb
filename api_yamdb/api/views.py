@@ -91,16 +91,16 @@ class UserViewSet(viewsets.ModelViewSet):
             elif user_username and username != data_of_me.data.get('username'):
                 message = {'username': f'{username} уже зарегистрирован'}
                 return Response(message, status=status.HTTP_400_BAD_REQUEST)
+            elif (data_of_me.data.get('role') == 'user'
+                    and 'role' in request.data):
+                message = {'role': 'user'}
+                return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
             serializer.save()
             return Response(serializer.data)
         else:
             serializer = self.get_serializer(request.user, many=False)
             return Response(serializer.data)
-
-    def partial_update(self, request, *args, **kwargs):
-        "Функция переопределяет 'PATCH-запрос' на 'PUT'"
-        return self.update(request, *args, **kwargs)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
