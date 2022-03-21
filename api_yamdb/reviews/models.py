@@ -8,8 +8,7 @@ from users.models import User
 class Category(models.Model):
     """Модель категорий."""
     name = models.CharField(
-        max_length=256,
-        unique=True,
+        max_length=256
     )
     slug = models.SlugField(
         max_length=50,
@@ -26,8 +25,7 @@ class Category(models.Model):
 class Genre(models.Model):
     """Модель жанров."""
     name = models.CharField(
-        max_length=256,
-        unique=True,
+        max_length=256
     )
     slug = models.SlugField(
         max_length=50,
@@ -43,7 +41,7 @@ class Genre(models.Model):
 
 class Title(models.Model):
     """Модель произведений."""
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
     year = models.IntegerField(
         null=True,
         blank=True,
@@ -65,13 +63,7 @@ class Title(models.Model):
     )
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['name', 'year'],
-                name='unique_name_year'
-            )
-        ]
-        ordering = ('id',)
+        ordering = ('-year', 'name',)
 
     def __str__(self):
         return self.name
