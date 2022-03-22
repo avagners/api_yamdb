@@ -1,4 +1,5 @@
 from rest_framework.permissions import SAFE_METHODS, BasePermission
+from users.models import UserRole
 
 
 class AuthorOrAdminOrModeratorOrReadOnly(BasePermission):
@@ -17,9 +18,8 @@ class AuthorOrAdminOrModeratorOrReadOnly(BasePermission):
 
         return (
             obj.author == request.user
-            or (
-                request.user.is_authenticated
-                and request.user.role in ['admin', 'moderator']))
+            or (request.user.is_authenticated
+                and request.user.role in [UserRole.ADMIN, UserRole.MODERATOR]))
 
 
 class IsAdminOrReadOnly(BasePermission):
@@ -30,30 +30,31 @@ class IsAdminOrReadOnly(BasePermission):
         return (
             request.method in SAFE_METHODS
             or request.user.is_authenticated
-            and request.user.role == 'admin'
+            and request.user.role == UserRole.ADMIN
         )
 
 
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
-        return (request.user.is_authenticated
-                and (request.user.is_staff or request.user.role == 'admin')
-                )
+        result = request.user.is_authenticated and (
+            request.user.is_staff or request.user.role == UserRole.ADMIN)
+        return result
 
 
 class IsModerator(BasePermission):
     def has_permission(self, request, view):
         return (request.user.is_authenticated
-                and request.user.role == 'moderator')
+                and request.user.role == UserRole.MODERATOR)
 
 
 class IsUser(BasePermission):
     def has_permission(self, request, view):
         return (request.user.is_authenticated
-                and request.user.role == 'user')
+                and request.user.role == UserRole.USER)
 
 
 class IsSuperUser(BasePermission):
     def has_permission(self, request, view):
         return (request.user.is_authenticated
-                and request.user.is_superuser or request.user.role == 'admin')
+                and request.user.is_superuser
+                or request.user.role == UserRole.ADMIN)
