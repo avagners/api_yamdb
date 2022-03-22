@@ -102,8 +102,10 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class SendConfirmationCodeSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    username = serializers.CharField(required=True)
+    email = serializers.EmailField(max_length=254, required=True)
+    username = serializers.RegexField(
+        max_length=150, required=True, regex=r"^[\w.@+-]+\Z"
+    )
 
     class Meta:
         model = User
@@ -118,13 +120,17 @@ class SendConfirmationCodeSerializer(serializers.Serializer):
 
 
 class SendTokenSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
+    username = serializers.RegexField(
+        max_length=150, required=True, regex=r"^[\w.@+-]+\Z"
+    )
     confirmation_code = serializers.CharField(required=True)
 
 
 class UpdateSelfSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=False)
-    username = serializers.CharField(required=False)
+    email = serializers.EmailField(max_length=254, required=False)
+    username = serializers.RegexField(
+        max_length=150, required=False, regex=r"^[\w.@+-]+\Z"
+    )
 
     class Meta:
         model = User
