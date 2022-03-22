@@ -1,21 +1,19 @@
-import random
-
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, serializers, status, viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import (LimitOffsetPagination,
                                        PageNumberPagination)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
 from reviews.models import Category, Genre, Review, Title
 from users.models import User, UserRole
 
+from api_yamdb.settings import EMAIL
 from .filters import TitleFilter
 from .mixins import ListCreateDestroyViewSet
 from .permissions import (AuthorOrAdminOrModeratorOrReadOnly, IsAdmin,
@@ -143,77 +141,67 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, review=review)
 
 
-class SendConfirmationCodeView(APIView):
-    """
-    Вью-класс описывает POST-запрос для регистрации нового пользователя и
-    получаения кода подтверждения, который необходим для получения JWT-токена.
+def send_email(email):
+    user = get_object_or_404(User, email=email)
+    confirmation_code = default_token_generator.make_token(user)
+    User.objects.filter(email=email).update(
+        confirmation_code=confirmation_code
+    )
+    send_mail(
+        subject='Ваш код подтверждения',
+        message=f'Ваш код подтверждения: {confirmation_code}',
+        from_email=EMAIL,
+        recipient_list=[email],
+        fail_silently=False,
+    )
 
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def send_confirmation_code(request):
+    """
+    Функция обрабатывает POST-запрос для регистрации нового пользователя и
+    получаения кода подтверждения, который необходим для получения JWT-токена.
     На вход подается 'username' и 'email', а в ответ происходит отправка
     на почту письма с кодом подтверждения.
     """
-    permission_classes = (AllowAny,)
+    serializer = SendConfirmationCodeSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
 
-    @staticmethod
-    def send_email(email):
-        confirmation_code = ''.join(map(str, random.sample(range(10), 6)))
-        User.objects.filter(email=email).update(
-            confirmation_code=confirmation_code
-        )
-        send_mail(
-            subject='Ваш код подтверждения',
-            message=f'Ваш код подтверждения: {confirmation_code}',
-            from_email='confirmation@yambd.com',
-            recipient_list=[email],
-            fail_silently=False,
-        )
+    email = serializer.validated_data.get('email')
+    username = serializer.validated_data.get('username')
+    user_email = User.objects.filter(email=email).exists()
+    user_username = User.objects.filter(username=username).exists()
 
-    def post(self, request):
-        serializer = SendConfirmationCodeSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        email = request.data.get('email')
-        username = request.data.get('username')
-        user_email = User.objects.filter(email=email).exists()
-        user_username = User.objects.filter(username=username).exists()
-
-        if user_email:
-            message = {'email': f'{email} уже зарегистрирован. '
-                       f'На {email} отправлен код для получения токена.'}
-            self.send_email(email)
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
-        elif user_username:
-            message = {'username': f'{username} уже зарегистрирован. '
-                       f'На {email} отправлен код для получения токена.'}
-            self.send_email(email)
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
-        elif username == 'me':
-            message = {'username': f'Некорректный username = "{username}"'}
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
-        elif not (user_email or user_username):
-            User.objects.create_user(email=email, username=username)
-            self.send_email(email)
-            message = {'email': email, 'username': username}
-            return Response(message, status=status.HTTP_200_OK)
+    if user_email:
+        message = {'email': f'{email} уже зарегистрирован.'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+    if user_username:
+        message = {'username': f'{username} уже зарегистрирован.'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+    if not (user_email or user_username):
+        User.objects.create_user(email=email, username=username)
+        send_email(email)
+        message = {'email': email, 'username': username}
+        return Response(message, status=status.HTTP_200_OK)
 
 
-class SendTokenView(APIView):
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def send_token(request):
     """
-    Вью-класс описывает POST-запрос для получаения JWT-токена.
-
+    Функция обрабатывает POST-запрос для получаения JWT-токена.
     На вход подается 'username' и 'confirmation_code',
     а в ответ формируется JWT-токен.
     """
-    permission_classes = (AllowAny,)
+    serializer = SendTokenSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    username = serializer.validated_data.get('username')
+    token = serializer.validated_data.get('confirmation_code')
+    user = get_object_or_404(User, username=username)
 
-    def post(self, request):
-        serializer = SendTokenSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data.get('username')
-        token = serializer.validated_data.get('confirmation_code')
-        user = get_object_or_404(User, username=username)
-
-        if not default_token_generator.check_token(user, token):
-            message = {'confirmation_code': 'Неверный код подтверждения'}
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
-        message = {'token': str(AccessToken.for_user(user))}
-        return Response(message, status=status.HTTP_200_OK)
+    if not default_token_generator.check_token(user, token):
+        message = {'confirmation_code': 'Неверный код подтверждения'}
+        return Response(message, status=status.HTTP_400_BAD_REQUEST)
+    message = {'token': str(AccessToken.for_user(user))}
+    return Response(message, status=status.HTTP_200_OK)

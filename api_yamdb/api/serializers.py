@@ -105,12 +105,21 @@ class SendConfirmationCodeSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     username = serializers.CharField(required=True)
 
+    class Meta:
+        model = User
+        fields = ('email', 'username')
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                f'Некорректный username = "{value}"'
+            )
+        return value
+
 
 class SendTokenSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
-    confirmation_code = serializers.CharField(
-        required=True,
-    )
+    confirmation_code = serializers.CharField(required=True)
 
 
 class UpdateSelfSerializer(serializers.ModelSerializer):

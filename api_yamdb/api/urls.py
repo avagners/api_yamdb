@@ -2,8 +2,8 @@ from django.urls import include, path
 from rest_framework import routers
 
 from .views import (CategoryViewSet, CommentViewSet, GenreViewSet,
-                    ReviewViewSet, SendConfirmationCodeView, SendTokenView,
-                    TitleViewSet, UserViewSet)
+                    ReviewViewSet, TitleViewSet, UserViewSet,
+                    send_confirmation_code, send_token)
 
 router = routers.DefaultRouter()
 
@@ -24,10 +24,10 @@ urlpatterns = [
     path('v1/', include(router.urls)),
     path(
         'v1/auth/token/',
-        SendTokenView.as_view(),
+        send_token,
         name='send_token'),
     path(
         'v1/auth/signup/',
-        SendConfirmationCodeView.as_view(),
+        send_confirmation_code,
         name='send_confirmation_code'),
 ]
