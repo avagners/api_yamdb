@@ -1,4 +1,4 @@
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
@@ -77,7 +77,10 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews'
     )
-    score = models.IntegerField(null=True)
+    score = models.IntegerField(
+        null=True,
+        validators=(MinValueValidator(1), MaxValueValidator(10))
+    )
     pub_date = models.DateTimeField(auto_now_add=True)
     title = models.ForeignKey(
         Title,
@@ -87,7 +90,11 @@ class Review(models.Model):
         related_name='reviews'
     )
 
+    def __str__(self) -> str:
+        return f'Отзыв {self.author.username} на {self.title.name}'
+
     class Meta:
+        ordering = ['-pub_date']
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'title'], name='unique_review'
@@ -108,3 +115,10 @@ class Comment(models.Model):
         Review,
         on_delete=models.CASCADE,
         related_name='comments')
+
+    class Meta:
+        ordering = ['-pub_date']
+
+    def __str__(self) -> str:
+        return (f'Комментарий {self.author.username} '
+                f'на отзыв {self.review.text}')
