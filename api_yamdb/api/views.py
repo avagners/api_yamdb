@@ -78,32 +78,32 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Функция обрабатывает 'GET' и 'PATCH' запросы на эндпоинт '/users/me/'
         """
-        if request.method != 'GET':
-            serializer = UpdateSelfSerializer(
-                instance=request.user, data=request.data
-            )
-            serializer.is_valid(raise_exception=True)
-
-            email = serializer.validated_data.get('email')
-            username = serializer.validated_data.get('username')
-            user_email = User.objects.filter(email=email).exists()
-            user_username = User.objects.filter(username=username).exists()
-
-            data_of_me = self.get_serializer(request.user, many=False)
-
-            if user_email and email != data_of_me.data.get('email'):
-                message = {'email': f'{email} уже зарегистрирован'}
-                return Response(message, status=status.HTTP_400_BAD_REQUEST)
-            if user_username and username != data_of_me.data.get('username'):
-                message = {'username': f'{username} уже зарегистрирован'}
-                return Response(message, status=status.HTTP_400_BAD_REQUEST)
-            if (data_of_me.data.get('role') == 'user'
-                    and 'role' in request.data):
-                message = {'role': 'user'}
-                return Response(message, status=status.HTTP_400_BAD_REQUEST)
-            serializer.save()
+        if request.method == 'GET':
+            serializer = self.get_serializer(request.user, many=False)
             return Response(serializer.data)
-        serializer = self.get_serializer(request.user, many=False)
+        serializer = UpdateSelfSerializer(
+            instance=request.user, data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data.get('email')
+        username = serializer.validated_data.get('username')
+        user_email = User.objects.filter(email=email).exists()
+        user_username = User.objects.filter(username=username).exists()
+
+        data_of_me = self.get_serializer(request.user, many=False)
+
+        if user_email and email != data_of_me.data.get('email'):
+            message = {'email': f'{email} уже зарегистрирован'}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+        if user_username and username != data_of_me.data.get('username'):
+            message = {'username': f'{username} уже зарегистрирован'}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+        if (data_of_me.data.get('role') == 'user'
+                and 'role' in request.data):
+            message = {'role': 'user'}
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
         return Response(serializer.data)
 
 
