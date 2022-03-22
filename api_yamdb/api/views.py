@@ -1,6 +1,7 @@
 import random
 
 from django.core.mail import send_mail
+from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, serializers, status, viewsets
@@ -207,9 +208,11 @@ class SendTokenView(APIView):
     def post(self, request):
         serializer = SendTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = request.data.get('username')
+        username = serializer.validated_data.get('username')
+        token = serializer.validated_data.get('confirmation_code')
         user = get_object_or_404(User, username=username)
-        if user.confirmation_code != request.data.get('confirmation_code'):
+
+        if not default_token_generator.check_token(user, token):
             message = {'confirmation_code': 'Неверный код подтверждения'}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
         message = {'token': str(AccessToken.for_user(user))}
