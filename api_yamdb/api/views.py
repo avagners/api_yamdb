@@ -84,8 +84,8 @@ class UserViewSet(viewsets.ModelViewSet):
             )
             serializer.is_valid(raise_exception=True)
 
-            email = request.data.get('email')
-            username = request.data.get('username')
+            email = serializer.validated_data.get('email')
+            username = serializer.validated_data.get('username')
             user_email = User.objects.filter(email=email).exists()
             user_username = User.objects.filter(username=username).exists()
 
@@ -94,19 +94,17 @@ class UserViewSet(viewsets.ModelViewSet):
             if user_email and email != data_of_me.data.get('email'):
                 message = {'email': f'{email} уже зарегистрирован'}
                 return Response(message, status=status.HTTP_400_BAD_REQUEST)
-            elif user_username and username != data_of_me.data.get('username'):
+            if user_username and username != data_of_me.data.get('username'):
                 message = {'username': f'{username} уже зарегистрирован'}
                 return Response(message, status=status.HTTP_400_BAD_REQUEST)
-            elif (data_of_me.data.get('role') == 'user'
+            if (data_of_me.data.get('role') == 'user'
                     and 'role' in request.data):
                 message = {'role': 'user'}
                 return Response(message, status=status.HTTP_400_BAD_REQUEST)
-
             serializer.save()
             return Response(serializer.data)
-        else:
-            serializer = self.get_serializer(request.user, many=False)
-            return Response(serializer.data)
+        serializer = self.get_serializer(request.user, many=False)
+        return Response(serializer.data)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
