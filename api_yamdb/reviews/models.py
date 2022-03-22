@@ -91,7 +91,7 @@ class Review(models.Model):
     )
 
     def __str__(self) -> str:
-        return f'Отзыв {self.author.username} на {self.title.name}'
+        return self.text
 
     class Meta:
         ordering = ['-pub_date']
@@ -120,5 +120,4 @@ class Comment(models.Model):
         ordering = ['-pub_date']
 
     def __str__(self) -> str:
-        return (f'Комментарий {self.author.username} '
-                f'на отзыв {self.review.text}')
+        return self.text
