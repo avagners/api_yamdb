@@ -17,3 +17,14 @@ df['bio'] = ""
 df['confirmation_code'] = '000000'
 
 df.to_sql('users_user', conn, if_exists='append', index=False)
+
+
+df2 = pd.read_csv('titles.csv')
+df2['description'] = ""
+df2.to_sql('reviews_title', conn, if_exists='append', index=False)
+
+df3 = pd.read_csv('review.csv')
+df3.to_sql('reviews_review', conn, if_exists='append', index=False)
+
+df4 = pd.read_csv('comments.csv')
+df4.to_sql('reviews_comment', conn, if_exists='append', index=False)
