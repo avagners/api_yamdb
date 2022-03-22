@@ -7,6 +7,9 @@ from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 
 
+SCORE = [i for i in range(1, 11)]
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -82,8 +85,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ('id', 'text', 'author', 'score', 'pub_date')
 
     def validate_score(self, value):
-        score = [i for i in range(1, 11)]
-        if value not in score:
+        if value not in SCORE:
             raise serializers.ValidationError(
                 'Оценка должна быть в диапазоне 1-10.'
             )
