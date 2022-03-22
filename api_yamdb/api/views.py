@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
 from reviews.models import Category, Genre, Review, Title
-from users.models import User
+from users.models import User, UserRole
 
 from .filters import TitleFilter
 from .mixins import ListCreateDestroyViewSet
@@ -99,7 +99,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if user_username and username != data_of_me.data.get('username'):
             message = {'username': f'{username} уже зарегистрирован'}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
-        if (data_of_me.data.get('role') == 'user'
+        if (data_of_me.data.get('role') == UserRole.USER
                 and 'role' in request.data):
             message = {'role': 'user'}
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
