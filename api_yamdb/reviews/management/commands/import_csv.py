@@ -68,4 +68,12 @@ class Command(BaseCommand):
                         first_name=row['first_name'],
                         last_name=row['last_name']
                     )
+
+                elif path[-1] == 'genre_title.csv':
+                    status, created = Title.genre.through.\
+                        objects.update_or_create(
+                            id=row['id'],
+                            title_id=row['title_id'],
+                            genre_id=row['genre_id']
+                        )
             print('Загрузка тестовых данных завершена.')
