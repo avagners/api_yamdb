@@ -37,8 +37,29 @@ class CommentAdmin(BaseAdminSettings):
     search_fields = ('author', 'review')
 
 
-admin.site.register(Category)
+class CategoryGenreAdmin(admin.ModelAdmin):
+    list_display = (
+        'slug',
+        'name'
+    )
+    search_fields = ('slug',)
+    list_filter = ('slug',)
+    empty_value_display = '-пусто-'
+
+
+class TitleAdmin(admin.ModelAdmin):
+    list_display = (
+        'name',
+        'year',
+        'category'
+    )
+    search_fields = ('name',)
+    list_filter = ('category',)
+    empty_value_display = '-пусто-'
+
+
+admin.site.register(Category, CategoryGenreAdmin)
 admin.site.register(Comment, CommentAdmin)
-admin.site.register(Genre)
+admin.site.register(Genre, CategoryGenreAdmin)
 admin.site.register(Review, ReviewAdmin)
-admin.site.register(Title)
+admin.site.register(Title, TitleAdmin)
