@@ -1,4 +1,4 @@
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Avg
 from django.utils import timezone
 from rest_framework import serializers
@@ -50,9 +50,13 @@ class TitlePostSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Category.objects.all()
     )
-    year = serializers.IntegerField(validators=(MaxValueValidator(
-        timezone.now().year,
-        message='Год не может быть больше текущего!'),))
+    year = serializers.IntegerField(
+        validators=(
+            MinValueValidator(0, message='Год не может быть больше меньше 0!'),
+            MaxValueValidator(timezone.now().year,
+                              message='Год не может быть больше текущего!'),
+        )
+    )
 
     class Meta:
         model = Title
