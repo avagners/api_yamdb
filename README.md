@@ -31,9 +31,9 @@ ___
 
     ``pip install -r requirements.txt``
 
-5. Выполнить миграции:
+5. Выполнить миграции и загрузить тестовые данные в базу:
 
-    ``python3 manage.py migrate``
+    ``python3 manage.py import_test_data``
 
 6. Запустите локальный сервер.
 
