@@ -6,7 +6,11 @@ import subprocess as sub
 
 
 class Command(BaseCommand):
-
+    """
+    Команда 'import_test_data' проводит миграции и
+    загружает тестовые данные в базу из csv файлов,
+    которые располагаются в директории /static/data/
+    """
     def handle(self, *args, **options):
         self.migreate_sqlite()
         self.import_users()
@@ -24,10 +28,6 @@ class Command(BaseCommand):
         cmd_migrate = 'python manage.py migrate'.strip().split()
         sub.call(cmd_makemigrations)
         sub.call(cmd_migrate)
-
-    def get_csv_files(self):
-        cmd_ls = 'ls static/data/'.strip().split()
-        return sub.check_output(cmd_ls).decode('utf-8').strip().split('\n')
 
     def import_users(self, file='users.csv'):
         print(f'Загрузка {file}...')
