@@ -1,5 +1,4 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db.models import Avg
 from django.utils import timezone
 from rest_framework import serializers
 
@@ -25,7 +24,7 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     genre = GenreSerializer(many=True, read_only=True)
-    rating = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Title
@@ -36,9 +35,6 @@ class TitleSerializer(serializers.ModelSerializer):
                   'description',
                   'genre',
                   'category',)
-
-    def get_rating(self, obj):
-        return obj.reviews.aggregate(rating=Avg('score')).get('rating')
 
 
 class TitlePostSerializer(serializers.ModelSerializer):
