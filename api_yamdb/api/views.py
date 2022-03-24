@@ -112,9 +112,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
-        if Review.objects.filter(author=self.request.user, title=title):
-            raise serializers.ValidationError(
-                'Нельзя добавить больше одного отзыва!')
         serializer.save(author=self.request.user, title=title)
 
 
@@ -133,6 +130,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         review = title.reviews.all().get(pk=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
+
 
 
 def send_email(email):
