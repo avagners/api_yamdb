@@ -1,4 +1,5 @@
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import (MaxValueValidator, MinValueValidator,
+                                    RegexValidator)
 from django.db import models
 from django.utils import timezone
 
@@ -12,7 +13,13 @@ class Category(models.Model):
     )
     slug = models.SlugField(
         max_length=50,
-        unique=True
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex='^[-a-zA-Z0-9_]+$',
+                message='Slug должен состоять из набора латинских букв и цифр',
+            ),
+        ]
     )
 
     class Meta:
