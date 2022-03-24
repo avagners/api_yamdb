@@ -78,13 +78,11 @@ class Review(models.Model):
         related_name='reviews'
     )
     score = models.IntegerField(
-        null=True,
         validators=(MinValueValidator(1), MaxValueValidator(10))
     )
     pub_date = models.DateTimeField(auto_now_add=True)
     title = models.ForeignKey(
         Title,
-        blank=True,
         null=True,
         on_delete=models.CASCADE,
         related_name='reviews'
