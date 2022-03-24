@@ -5,7 +5,6 @@ from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
 
-
 SCORE = [i for i in range(1, 11)]
 
 
@@ -96,7 +95,9 @@ class ReviewSerializer(serializers.ModelSerializer):
             author = self.context.get('request').user
             title = self.context.get('view').kwargs.get(['title_id'][0])
             if Review.objects.filter(author=author, title=title).exists():
-                raise serializers.ValidationError('Нельзя добавить больше одного отзыва!')
+                raise serializers.ValidationError(
+                    'Нельзя добавить больше одного отзыва!'
+                )
         return data
 
 
