@@ -2,10 +2,15 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class UserRole(models.TextChoices):
+class UserRole:
     USER = 'user'
     MODERATOR = 'moderator'
     ADMIN = 'admin'
+    choices = [
+        (USER, 'user'),
+        (ADMIN, 'admin'),
+        (MODERATOR, 'moderator'),
+    ]
 
 
 class User(AbstractUser):
