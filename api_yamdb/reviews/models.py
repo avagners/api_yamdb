@@ -9,11 +9,13 @@ from users.models import User
 class Category(models.Model):
     """Модель категорий."""
     name = models.CharField(
-        max_length=256
+        max_length=256,
+        verbose_name='Категория',
     )
     slug = models.SlugField(
         max_length=50,
         unique=True,
+        verbose_name='Слаг',
         validators=[
             RegexValidator(
                 regex='^[-a-zA-Z0-9_]+$',
@@ -32,11 +34,13 @@ class Category(models.Model):
 class Genre(models.Model):
     """Модель жанров."""
     name = models.CharField(
-        max_length=256
+        max_length=256,
+        verbose_name='Жанр'
     )
     slug = models.SlugField(
         max_length=50,
-        unique=True
+        unique=True,
+        verbose_name='Слаг'
     )
 
     class Meta:
