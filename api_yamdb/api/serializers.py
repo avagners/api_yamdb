@@ -101,7 +101,6 @@ class ReviewSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Нельзя добавить больше одного отзыва!'
             )
-            return data
         return data
 
 
