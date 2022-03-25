@@ -95,9 +95,6 @@ class Review(models.Model):
         related_name='reviews'
     )
 
-    def __str__(self) -> str:
-        return self.text
-
     class Meta:
         ordering = ['-pub_date']
         constraints = [
@@ -105,6 +102,9 @@ class Review(models.Model):
                 fields=['author', 'title'], name='unique_review'
             )
         ]
+
+    def __str__(self) -> str:
+        return self.text
 
 
 class Comment(models.Model):
