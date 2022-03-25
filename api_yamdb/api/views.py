@@ -16,6 +16,7 @@ from reviews.models import Category, Genre, Title
 from users.models import User, UserRole
 from .filters import TitleFilter
 from .mixins import ListCreateDestroyViewSet
+from .utils import get_reviews_obj, get_titles_obj
 from .permissions import (AuthorOrAdminOrModeratorOrReadOnly, IsAdmin,
                           IsAdminOrReadOnly, IsSuperUser)
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -106,11 +107,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
     permission_classes = (AuthorOrAdminOrModeratorOrReadOnly,)
 
     def get_queryset(self):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        title = get_titles_obj(self, 'title_id')
         return title.reviews.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        title = get_titles_obj(self, 'title_id')
         serializer.save(author=self.request.user, title=title)
 
 
@@ -121,13 +122,11 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (AuthorOrAdminOrModeratorOrReadOnly,)
 
     def get_queryset(self):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
-        review = title.reviews.all().get(pk=self.kwargs.get('review_id'))
+        review = get_reviews_obj(self, 'title_id', 'review_id')
         return review.comments.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
-        review = title.reviews.all().get(pk=self.kwargs.get('review_id'))
+        review = get_reviews_obj(self, 'title_id', 'review_id')
         serializer.save(author=self.request.user, review=review)
 
 
