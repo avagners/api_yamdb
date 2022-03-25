@@ -10,7 +10,7 @@ class Category(models.Model):
     """Модель категорий."""
     name = models.CharField(
         max_length=256,
-        verbose_name='Категория',
+        verbose_name='Категория'
     )
     slug = models.SlugField(
         max_length=50,
@@ -26,6 +26,8 @@ class Category(models.Model):
 
     class Meta:
         ordering = ('name',)
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
         return self.slug
@@ -45,6 +47,8 @@ class Genre(models.Model):
 
     class Meta:
         ordering = ('name',)
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
 
     def __str__(self):
         return self.slug
@@ -52,29 +56,40 @@ class Genre(models.Model):
 
 class Title(models.Model):
     """Модель произведений."""
-    name = models.CharField(max_length=100)
+    name = models.CharField(
+        max_length=100,
+        verbose_name='Произведение',
+    )
     year = models.IntegerField(
         null=True,
         blank=True,
+        verbose_name='Год выхода',
         validators=(MaxValueValidator(
             timezone.now().year,
             message='Год не может быть больше текущего!'),)
     )
     genre = models.ManyToManyField(
         Genre,
+        verbose_name='Жанр',
         related_name='titles'
     )
-    description = models.TextField(blank=True)
+    description = models.TextField(
+        blank=True,
+        verbose_name='Описание',
+    )
     category = models.ForeignKey(
         Category,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
+        verbose_name='Категория',
         related_name='titles'
     )
 
     class Meta:
         ordering = ('-year', 'name',)
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
 
     def __str__(self):
         return self.name
