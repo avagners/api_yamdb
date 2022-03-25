@@ -1,8 +1,9 @@
-from django.core.management.base import BaseCommand
-from reviews.models import Title, Category, Genre, Review, Comment
-from users.models import User
 import csv
 import subprocess as sub
+
+from django.core.management.base import BaseCommand
+from reviews.models import Category, Comment, Genre, Review, Title
+from users.models import User
 
 
 class Command(BaseCommand):
