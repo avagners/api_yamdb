@@ -105,12 +105,16 @@ class ReviewViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     permission_classes = (AuthorOrAdminOrModeratorOrReadOnly,)
 
+    def get_titles_obj(self, title_id):
+        """Получение объектов произведений."""
+        return get_object_or_404(Title, pk=self.kwargs.get(title_id))
+
     def get_queryset(self):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        title = self.get_titles_obj('title_id')
         return title.reviews.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        title = self.get_titles_obj('title_id')
         serializer.save(author=self.request.user, title=title)
 
 
@@ -120,14 +124,17 @@ class CommentViewSet(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     permission_classes = (AuthorOrAdminOrModeratorOrReadOnly,)
 
+    def get_reviews_obj(self, title_obj_id, review_obj_id):
+        """Получение объектов отзывов."""
+        title = get_object_or_404(Title, pk=self.kwargs.get(title_obj_id))
+        return title.reviews.all().get(pk=self.kwargs.get(review_obj_id))
+
     def get_queryset(self):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
-        review = title.reviews.all().get(pk=self.kwargs.get('review_id'))
+        review = self.get_reviews_obj('title_id', 'review_id')
         return review.comments.all()
 
     def perform_create(self, serializer):
-        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
-        review = title.reviews.all().get(pk=self.kwargs.get('review_id'))
+        review = self.get_reviews_obj('title_id', 'review_id')
         serializer.save(author=self.request.user, review=review)
 
 
